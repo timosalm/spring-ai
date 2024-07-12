@@ -1,0 +1,37 @@
+.subtitle {
+    font-size: 80%;
+    margin-top: 10px;
+    margin-left: 5px;
+    font-style: italic;
+}
+
+td {
+    vertical-align: top;
+}
+
+td > :first-child {
+    margin-top: 0;
+}
+
+input, button, select, textarea {
+    border-radius: 0.5em;
+    border-width: 1px;
+    border-color: rgb(200, 200, 200);
+    border-style: solid;
+}
+
+input[type=text] {
+    width: 25em;
+}
+
+ul {
+    margin-top: 1.2rem;
+}
+
+#recipe-infos-col {
+    padding-right: 5em;
+}
+
+#recipe-img {
+    width: 100%;
+}

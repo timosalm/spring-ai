@@ -1,0 +1,5 @@
+spring:
+  application.name: RecipeFinder
+  ai:
+    openai.chat.enabled: false
+    ollama.chat.model: llama3
