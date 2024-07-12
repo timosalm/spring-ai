@@ -3,3 +3,7 @@ spring:
   ai:
     openai.chat.enabled: false
     ollama.chat.model: llama3
+    azure.openai:
+        image.options:
+          deployment-name: dall-e-3
+          model: dall-e-3

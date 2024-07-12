@@ -1,6 +1,5 @@
 package com.example;
 
-
 import java.util.List;
 
 public record Recipe(String name, String description, List<String> ingredients, String instructions, String imageUrl) {

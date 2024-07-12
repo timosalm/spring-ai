@@ -2,7 +2,6 @@ package com.example;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.image.ImageMessage;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +16,6 @@ public class RecipeService {
 
     private final ChatClient chatClient;
     private final ImageModel imageModel;
-    private final FetchAvailableIngredientsService availableIngredientsService;
 
     @Value("classpath:/prompts/recipe-for-ingredients")
     private Resource recipeForIngredientsPromptResource;
@@ -28,31 +26,43 @@ public class RecipeService {
     @Value("classpath:/prompts/image-for-recipe")
     private Resource imageForRecipePromptResource;
 
-    public RecipeService(ChatClient chatClient, ImageModel imageModel, FetchAvailableIngredientsService availableIngredientsService) {
+    public RecipeService(ChatClient chatClient, ImageModel imageModel) {
         this.chatClient = chatClient;
         this.imageModel = imageModel;
-        this.availableIngredientsService = availableIngredientsService;
     }
 
     public Recipe fetchRecipeFor(List<String> ingredients, boolean preferAvailableIngredients) {
-        var promptTemplate = new PromptTemplate(preferAvailableIngredients ? recipeForAvailableIngredientsPromptResource : recipeForIngredientsPromptResource);
-        var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
-        var recipe = chatClient.prompt()
-                .messages(promptMessage)
-                .function("FetchAvailableIngredientsService", "Fetches ingredients that are available at home", availableIngredientsService)
-                .call()
-                .entity(Recipe.class);
+        Recipe recipe;
+        if (!preferAvailableIngredients) {
+            recipe = fetchRecipeFor(ingredients);
+        } else {
+            recipe = fetchRecipeWithFunctionCallingFor(ingredients);
+        }
 
         var imagePromptTemplate = new PromptTemplate(imageForRecipePromptResource);
-        var imagePromptMessage = new ImageMessage(imagePromptTemplate.render(Map.of("recipe", recipe.name(), "ingredients", String.join(",", recipe.ingredients()))));
-        var imageGeneration = imageModel.call(new ImagePrompt(List.of(imagePromptMessage))).getResult();
+        var imagePromptInstructions = imagePromptTemplate.render(Map.of("recipe", recipe.name(), "ingredients", String.join(",", recipe.ingredients())));
+        var imageGeneration = imageModel.call(new ImagePrompt(imagePromptInstructions)).getResult();
         return new Recipe(recipe, imageGeneration.getOutput().getUrl());
     }
 
-    public void addRecipes(List<Recipe> newRecipes) {
+    private Recipe fetchRecipeFor(List<String> ingredients) {
+        var promptTemplate = new PromptTemplate(recipeForIngredientsPromptResource);
+        var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
+
+        return chatClient.prompt()
+                .messages(promptMessage)
+                .call()
+                .entity(Recipe.class);
     }
 
-    public List<Recipe> fetchRecipes() {
-        return null;
+    private Recipe fetchRecipeWithFunctionCallingFor(List<String> ingredients) {
+        var promptTemplate = new PromptTemplate(recipeForAvailableIngredientsPromptResource);
+        var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
+
+        return chatClient.prompt()
+                .messages(promptMessage)
+                .functions("fetchAvailableIngredients")
+                .call()
+                .entity(Recipe.class);
     }
 }
