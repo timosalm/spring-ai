@@ -5,5 +5,5 @@ spring:
     ollama.chat.model: llama3
     azure.openai:
         image.options:
-          deployment-name: dall-e-3
+          deployment-name: Dalle3
           model: dall-e-3
