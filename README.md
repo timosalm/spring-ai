@@ -16,7 +16,6 @@ By enabling the "ollama-compose" Spring profile, the llama3 model will be automa
 Depending on your system (e.g. ARM macs) this is not a recommended setup due to performance reasons.
 ```
 SPRING_PROFILES_ACTIVE=ollama-compose
-./gradlew bootRun
 ```
 ### OpenAI (TODO)
 ### Azure OpenAI
@@ -28,8 +27,26 @@ export SPRING_AI_AZURE_OPENAI_ENDPOINT=<INSERT ENDPOINT URL HERE>
 Run your application with the "azure" Spring Profile.
 ```
 SPRING_PROFILES_ACTIVE=azure
-./gradlew bootRun
 ```
 ### Vector DB
 On your local machine, a Redis database is automatically started and configured with docker compose.
 
+# Running the application locally
+```
+./gradlew bootRun
+```
+Open [http://localhost:8080](http://localhost:8080) in your browser. 
+Enter the ingredients you want to find a recipe for in the form and press the "find" button.
+
+## Function Calling 
+By checking the "Prefer available ingredients" checkbox, [Function Calling](https://docs.spring.io/spring-ai/reference/1.0/concepts.html#_function_calling) will be enabled.
+As the functionalities to add always available ingredients and for the API call to check the available ingredients in the fridge are not yet implemented, they can be configured via the
+`app.always-available-ingredients` and `app.available-ingredients-in-fridge` properties in [application.yaml](src/main/resources/application.yaml).
+
+## Retrieval-Augmented Generation(RAG)
+By checking the "Prefer own recipes" checkbox, [Retrieval-Augmented Generation](https://docs.spring.io/spring-ai/reference/1.0/concepts.html#concept-rag) will be enabled.
+
+To upload your own PDF documents for recipes to the vector database, there is a REST API endpoint implemented. 
+````
+curl -XPOST -F "file=@$HOME/my-recipe.pdf" http://localhost:8080/api/v1/recipes/upload
+```

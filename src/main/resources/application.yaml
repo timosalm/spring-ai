@@ -5,6 +5,13 @@ spring:
     ollama:
       chat.model: llama3
       embedding.model: llama3
+  servlet.multipart:
+    max-file-size: 100MB
+    max-request-size: 100MB
+server.tomcat.max-swallow-size: -1
+app:
+  always-available-ingredients: wine,salt,pepper,olive oil,broth,rice
+  available-ingredients-in-fridge: salmon,zucchinis
 ---
 spring:
   config.activate.on-profile: ollama-compose

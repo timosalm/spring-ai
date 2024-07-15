@@ -29,8 +29,12 @@ dependencies {
 
 	implementation 'org.springframework.ai:spring-ai-ollama-spring-boot-starter'
 	implementation 'org.springframework.ai:spring-ai-azure-openai-spring-boot-starter'
+
 	implementation 'org.springframework.ai:spring-ai-transformers-spring-boot-starter'
 	implementation 'org.springframework.ai:spring-ai-redis-store-spring-boot-starter'
+
+	implementation 'org.springframework.ai:spring-ai-pdf-document-reader'
+
 	implementation "org.springframework.ai:spring-ai-spring-boot-docker-compose:${springAiVersion}"
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

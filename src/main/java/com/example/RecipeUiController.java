@@ -34,7 +34,7 @@ public class RecipeUiController {
 
     @PostMapping("/recipe")
     public ModelAndView fetchRecipeUiFor(FetchRecipeData fetchRecipeData, Model model) {
-        var recipe = recipeService.fetchRecipeFor(fetchRecipeData.ingredients(), fetchRecipeData.isPreferAvailableIngredients());
+        var recipe = recipeService.fetchRecipeFor(fetchRecipeData.ingredients(), fetchRecipeData.isPreferAvailableIngredients(), fetchRecipeData.isPreferOwnRecipes());
         var view = new ModelAndView("index");
         model.addAttribute("aiModel", getAiModelNames());
         model.addAttribute("fetchRecipeData", fetchRecipeData);
@@ -45,7 +45,7 @@ public class RecipeUiController {
     private String getAiModelNames() {
         var chatModelName = chatModel.getClass().getSimpleName().replace("ChatModel", "");
         var imageModelName = imageModel.map(
-                model -> model.getClass().getSimpleName().replace("ImageModel", "")).orElse("");
+                model -> model.getClass().getSimpleName().replace("ImageModel", "")).orElse("-");
         if (chatModelName.equals(imageModelName)) {
             return chatModelName;
         }
