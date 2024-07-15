@@ -2,7 +2,9 @@ spring:
   application.name: RecipeFinder
   autoconfigure.exclude: org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfiguration
   ai:
-    ollama.chat.model: llama3
+    ollama:
+      chat.model: llama3
+      embedding.model: llama3
 ---
 spring:
   config.activate.on-profile: ollama-compose
