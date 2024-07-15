@@ -1,4 +1,4 @@
-#Spring AI Recipe Finder
+# Spring AI Recipe Finder
 
 # Setup
 ## LLM
@@ -15,7 +15,7 @@ As Ollama doesn't yet provide a text-to-image model, recipe image generation is 
 By enabling the "ollama-compose" Spring profile, the llama3 model will be automatically started and configured with docker compose.
 Depending on your system (e.g. ARM macs) this is not a recommended setup due to performance reasons.
 ```
-SPRING_PROFILES_ACTIVE=ollama-compose
+export SPRING_PROFILES_ACTIVE=ollama-compose
 ```
 ### OpenAI (TODO)
 ### Azure OpenAI
@@ -26,7 +26,7 @@ export SPRING_AI_AZURE_OPENAI_ENDPOINT=<INSERT ENDPOINT URL HERE>
 ```
 Run your application with the "azure" Spring Profile.
 ```
-SPRING_PROFILES_ACTIVE=azure
+export SPRING_PROFILES_ACTIVE=azure
 ```
 ### Vector DB
 On your local machine, a Redis database is automatically started and configured with docker compose.
