@@ -1,9 +1,16 @@
 spring:
   application.name: RecipeFinder
+  autoconfigure.exclude: org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfiguration
   ai:
-    openai.chat.enabled: false
+    azure.openai.chat.enabled: false
     ollama.chat.model: llama3
-    azure.openai:
-        image.options:
-          deployment-name: Dalle3
-          model: dall-e-3
+  # docker.compose.profiles.active: ollama
+---
+spring:
+  config.activate.on-profile: azure
+  autoconfigure.exclude: org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration
+  ai.azure.openai:
+    chat.enabled: true
+    image.options:
+      deployment-name: Dalle3
+      model: dall-e-3

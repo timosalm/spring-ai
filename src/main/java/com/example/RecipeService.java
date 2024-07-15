@@ -10,12 +10,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class RecipeService {
 
     private final ChatClient chatClient;
-    private final ImageModel imageModel;
+    private final Optional<ImageModel> imageModel;
 
     @Value("classpath:/prompts/recipe-for-ingredients")
     private Resource recipeForIngredientsPromptResource;
@@ -26,7 +27,7 @@ public class RecipeService {
     @Value("classpath:/prompts/image-for-recipe")
     private Resource imageForRecipePromptResource;
 
-    public RecipeService(ChatClient chatClient, ImageModel imageModel) {
+    public RecipeService(ChatClient chatClient, Optional<ImageModel> imageModel) {
         this.chatClient = chatClient;
         this.imageModel = imageModel;
     }
@@ -39,10 +40,13 @@ public class RecipeService {
             recipe = fetchRecipeWithFunctionCallingFor(ingredients);
         }
 
-        var imagePromptTemplate = new PromptTemplate(imageForRecipePromptResource);
-        var imagePromptInstructions = imagePromptTemplate.render(Map.of("recipe", recipe.name(), "ingredients", String.join(",", recipe.ingredients())));
-        var imageGeneration = imageModel.call(new ImagePrompt(imagePromptInstructions)).getResult();
-        return new Recipe(recipe, imageGeneration.getOutput().getUrl());
+        if (imageModel.isPresent()) {
+            var imagePromptTemplate = new PromptTemplate(imageForRecipePromptResource);
+            var imagePromptInstructions = imagePromptTemplate.render(Map.of("recipe", recipe.name(), "ingredients", String.join(",", recipe.ingredients())));
+            var imageGeneration = imageModel.get().call(new ImagePrompt(imagePromptInstructions)).getResult();
+            return new Recipe(recipe, imageGeneration.getOutput().getUrl());
+        }
+        return recipe;
     }
 
     private Recipe fetchRecipeFor(List<String> ingredients) {

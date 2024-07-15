@@ -9,15 +9,17 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Optional;
+
 @Controller
 @RequestMapping("/")
 public class RecipeUiController {
 
     final RecipeService recipeService;
     private final ChatModel chatModel;
-    private final ImageModel imageModel;
+    private final Optional<ImageModel> imageModel;
 
-    public RecipeUiController(RecipeService recipeService, ChatModel chatModel, ImageModel imageModel) {
+    public RecipeUiController(RecipeService recipeService, ChatModel chatModel, Optional<ImageModel> imageModel) {
         this.recipeService = recipeService;
         this.chatModel = chatModel;
         this.imageModel = imageModel;
@@ -42,7 +44,8 @@ public class RecipeUiController {
 
     private String getAiModelNames() {
         var chatModelName = chatModel.getClass().getSimpleName().replace("ChatModel", "");
-        var imageModelName = imageModel.getClass().getSimpleName().replace("ImageModel", "");
+        var imageModelName = imageModel.map(
+                model -> model.getClass().getSimpleName().replace("ImageModel", "")).orElse("");
         if (chatModelName.equals(imageModelName)) {
             return chatModelName;
         }
