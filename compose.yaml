@@ -11,7 +11,7 @@ services:
     ports:
       - 11434
     volumes:
-      - ~/.ollama/models:/usr/share/ollama/.ollama/models
+      - ~/.ollama/models:/root/.ollama/models
   ollama-runner:
     container_name: ollama-runner
     profiles:

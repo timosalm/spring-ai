@@ -4,6 +4,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ public class RecipeService {
 
     private final ChatClient chatClient;
     private final Optional<ImageModel> imageModel;
+    private final VectorStore vectorStore;
 
     @Value("classpath:/prompts/recipe-for-ingredients")
     private Resource recipeForIngredientsPromptResource;
@@ -27,9 +29,10 @@ public class RecipeService {
     @Value("classpath:/prompts/image-for-recipe")
     private Resource imageForRecipePromptResource;
 
-    public RecipeService(ChatClient chatClient, Optional<ImageModel> imageModel) {
+    public RecipeService(ChatClient chatClient, Optional<ImageModel> imageModel, VectorStore vectorStore) {
         this.chatClient = chatClient;
         this.imageModel = imageModel;
+        this.vectorStore = vectorStore;
     }
 
     public Recipe fetchRecipeFor(List<String> ingredients, boolean preferAvailableIngredients) {
