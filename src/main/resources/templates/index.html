@@ -51,7 +51,7 @@
                                                 <li th:each="instruction : ${recipe.instructions}" th:text="${instruction}">Instruction</li>
                                             </ul>
                                         </td>
-                                        <td th:if="${recipe.imageUrl != null}"><img th:src="@{${recipe.imageUrl}}" alt="Recipe Image" id="recipe-img" /></td>
+                                        <td th:if="${not #strings.isEmpty(recipe.imageUrl)}"><img th:src="@{${recipe.imageUrl}}" alt="Recipe Image" id="recipe-img" /></td>
                                     </tr>
                                     </tbody>
                                 </table>
