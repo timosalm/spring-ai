@@ -47,6 +47,6 @@ As the functionalities to add always available ingredients and for the API call 
 By checking the "Prefer own recipes" checkbox, [Retrieval-Augmented Generation](https://docs.spring.io/spring-ai/reference/1.0/concepts.html#concept-rag) will be enabled.
 
 To upload your own PDF documents for recipes to the vector database, there is a REST API endpoint implemented. 
-````
+```
 curl -XPOST -F "file=@$HOME/my-recipe.pdf" http://localhost:8080/api/v1/recipes/upload
 ```
