@@ -1,6 +1,9 @@
 package com.example;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.io.JsonEOFException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.stereotype.Controller;
@@ -16,7 +19,9 @@ import java.util.Optional;
 @RequestMapping("/")
 public class RecipeUiController {
 
-    final RecipeService recipeService;
+    private static final Logger log = LoggerFactory.getLogger(RecipeUiController.class);
+
+    private final RecipeService recipeService;
     private final ChatModel chatModel;
     private final Optional<ImageModel> imageModel;
 
@@ -35,12 +40,14 @@ public class RecipeUiController {
 
     @PostMapping
     public String fetchRecipeUiFor(FetchRecipeData fetchRecipeData, Model model) throws Exception {
+        Recipe recipe;
         try {
-            var recipe = recipeService.fetchRecipeFor(fetchRecipeData.ingredients(), fetchRecipeData.isPreferAvailableIngredients(), fetchRecipeData.isPreferOwnRecipes());
-            model.addAttribute("recipe", recipe);
+            recipe = recipeService.fetchRecipeFor(fetchRecipeData.ingredients(), fetchRecipeData.isPreferAvailableIngredients(), fetchRecipeData.isPreferOwnRecipes());
         } catch (Exception e) {
-            handleException(model, e);
+            log.info("Retry RecipeUiController:fetchRecipeFor after exception caused by LLM");
+            recipe = recipeService.fetchRecipeFor(fetchRecipeData.ingredients(), fetchRecipeData.isPreferAvailableIngredients(), fetchRecipeData.isPreferOwnRecipes());
         }
+        model.addAttribute("recipe", recipe);
         model.addAttribute("aiModel", getAiModelNames());
         model.addAttribute("fetchRecipeData", fetchRecipeData);
         return "index";
@@ -56,9 +63,10 @@ public class RecipeUiController {
         return chatModelName + " & " + imageModelName;
     }
 
-    private static void handleException(Model model, Exception e) throws Exception {
-        if (e instanceof JsonEOFException) {
-            model.addAttribute("errorMessage", "Unable to parse LLM response");
+    private Recipe handleException(FetchRecipeData fetchRecipeData, Model model, Exception e) throws Exception {
+        if (e instanceof JsonEOFException || e instanceof JsonParseException || e instanceof IllegalStateException) {
+            log.info("Retry fetchRecipeFor after exception caused by LLM");
+            return recipeService.fetchRecipeFor(fetchRecipeData.ingredients(), fetchRecipeData.isPreferAvailableIngredients(), fetchRecipeData.isPreferOwnRecipes());
         } else {
             throw e;
         }

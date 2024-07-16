@@ -34,7 +34,6 @@
                                 <label for="prefer-own-recipes">Prefer own recipes</label>
                                 <button type="submit">Find</button>
                             </form>
-                            <p th:if="${errorMessage}" th:text="${errorMessage}">Error</p>
 
                             <div th:if="${recipe != null}">
                                 <h2 th:text="${recipe.name}">Recipe Name</h2>

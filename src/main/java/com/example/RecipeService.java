@@ -1,5 +1,6 @@
 package com.example;
 
+import com.fasterxml.jackson.core.ErrorReportConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -24,7 +25,7 @@ public class RecipeService {
 
     private static final Logger log = LoggerFactory.getLogger(RecipeService.class);
 
-    private final ChatClient chatClient;
+    private final ChatClient.Builder chatClientBuilder;
     private final Optional<ImageModel> imageModel;
     private final VectorStore vectorStore;
 
@@ -37,8 +38,8 @@ public class RecipeService {
     @Value("classpath:/prompts/image-for-recipe")
     private Resource imageForRecipePromptResource;
 
-    public RecipeService(ChatClient chatClient, Optional<ImageModel> imageModel, VectorStore vectorStore) {
-        this.chatClient = chatClient;
+    public RecipeService(ChatClient.Builder chatClientBuilder, Optional<ImageModel> imageModel, VectorStore vectorStore) {
+        this.chatClientBuilder = chatClientBuilder;
         this.imageModel = imageModel;
         this.vectorStore = vectorStore;
     }
@@ -69,7 +70,7 @@ public class RecipeService {
         var promptTemplate = new PromptTemplate(recipeForIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
 
-        return chatClient.prompt()
+        return chatClientBuilder.build().prompt()
                 .messages(promptMessage)
                 .call()
                 .entity(Recipe.class);
@@ -80,7 +81,7 @@ public class RecipeService {
         var promptTemplate = new PromptTemplate(recipeForAvailableIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
 
-        return chatClient.prompt()
+        return chatClientBuilder.build().prompt()
                 .messages(promptMessage)
                 .functions("fetchIngredientsAvailableAtHome")
                 .call()
@@ -92,7 +93,7 @@ public class RecipeService {
         var promptTemplate = new PromptTemplate(recipeForIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
 
-        return chatClient.prompt()
+        return chatClientBuilder.build().prompt()
                 .messages(promptMessage)
                 .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()))
                 .call()
@@ -104,7 +105,7 @@ public class RecipeService {
         var promptTemplate = new PromptTemplate(recipeForAvailableIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
 
-        return chatClient.prompt()
+        return chatClientBuilder.build().prompt()
                 .messages(promptMessage)
                 .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()))
                 .functions("fetchIngredientsAvailableAtHome")
