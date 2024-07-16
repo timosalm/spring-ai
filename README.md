@@ -3,9 +3,9 @@
 # Setup
 ## LLM
 ### Local LLM (Ollama)
-#### Option 1
 As Ollama doesn't yet provide a text-to-image model, recipe image generation is not available with this setup.
-
+Also Function calling is not supported by the Ollama models.
+#### Option 1
 1. Download and install Ollama on your local machine [link](https://ollama.com/)
 2. Start llama3 model
     ```
@@ -48,5 +48,5 @@ By checking the "Prefer own recipes" checkbox, [Retrieval-Augmented Generation](
 
 To upload your own PDF documents for recipes to the vector database, there is a REST API endpoint implemented. 
 ```
-curl -XPOST -F "file=@$HOME/my-recipe.pdf" http://localhost:8080/api/v1/recipes/upload
+curl -XPOST -F "file=@$PWD/my-recipe.pdf" http://localhost:8080/api/v1/recipes/upload
 ```

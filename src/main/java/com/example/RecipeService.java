@@ -1,5 +1,7 @@
 package com.example;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.prompt.PromptTemplate;
@@ -19,6 +21,8 @@ import java.util.Optional;
 
 @Service
 public class RecipeService {
+
+    private static final Logger log = LoggerFactory.getLogger(RecipeService.class);
 
     private final ChatClient chatClient;
     private final Optional<ImageModel> imageModel;
@@ -61,6 +65,7 @@ public class RecipeService {
     }
 
     private Recipe fetchRecipeFor(List<String> ingredients) {
+        log.info("Fetch recipe without additional information");
         var promptTemplate = new PromptTemplate(recipeForIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
 
@@ -71,17 +76,19 @@ public class RecipeService {
     }
 
     private Recipe fetchRecipeWithFunctionCallingFor(List<String> ingredients) {
+        log.info("Fetch recipe with additional information from function calling");
         var promptTemplate = new PromptTemplate(recipeForAvailableIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
 
         return chatClient.prompt()
                 .messages(promptMessage)
-                .functions("fetchAvailableIngredients")
+                .functions("fetchIngredientsAvailableAtHome")
                 .call()
                 .entity(Recipe.class);
     }
 
     private Recipe fetchRecipeWithRagFor(List<String> ingredients) {
+        log.info("Fetch recipe with additional information from vector store");
         var promptTemplate = new PromptTemplate(recipeForIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
 
@@ -93,18 +100,20 @@ public class RecipeService {
     }
 
     private Recipe fetchRecipeWithRagAndFunctionCallingFor(List<String> ingredients) {
+        log.info("Fetch recipe with additional information from vector store and function calling");
         var promptTemplate = new PromptTemplate(recipeForAvailableIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
 
         return chatClient.prompt()
                 .messages(promptMessage)
                 .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()))
-                .functions("fetchAvailableIngredients")
+                .functions("fetchIngredientsAvailableAtHome")
                 .call()
                 .entity(Recipe.class);
     }
 
-    public void addRecipeDocumentsForRag(Resource pdfResource) {
+    public void addRecipeDocumentForRag(Resource pdfResource) {
+        log.info("Add recipe document {} for rag", pdfResource.getFilename());
         var documentReader = new PagePdfDocumentReader(pdfResource);
         var documents = new TokenTextSplitter().apply(documentReader.get());
         vectorStore.accept(documents);

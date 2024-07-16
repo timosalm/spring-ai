@@ -1,5 +1,6 @@
 package com.example;
 
+import com.fasterxml.jackson.core.io.JsonEOFException;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.stereotype.Controller;
@@ -32,14 +33,17 @@ public class RecipeUiController {
         return "index";
     }
 
-    @PostMapping("/recipe")
-    public ModelAndView fetchRecipeUiFor(FetchRecipeData fetchRecipeData, Model model) {
-        var recipe = recipeService.fetchRecipeFor(fetchRecipeData.ingredients(), fetchRecipeData.isPreferAvailableIngredients(), fetchRecipeData.isPreferOwnRecipes());
-        var view = new ModelAndView("index");
+    @PostMapping
+    public String fetchRecipeUiFor(FetchRecipeData fetchRecipeData, Model model) throws Exception {
+        try {
+            var recipe = recipeService.fetchRecipeFor(fetchRecipeData.ingredients(), fetchRecipeData.isPreferAvailableIngredients(), fetchRecipeData.isPreferOwnRecipes());
+            model.addAttribute("recipe", recipe);
+        } catch (Exception e) {
+            handleException(model, e);
+        }
         model.addAttribute("aiModel", getAiModelNames());
         model.addAttribute("fetchRecipeData", fetchRecipeData);
-        model.addAttribute("recipe", recipe);
-        return view;
+        return "index";
     }
 
     private String getAiModelNames() {
@@ -50,5 +54,13 @@ public class RecipeUiController {
             return chatModelName;
         }
         return chatModelName + " & " + imageModelName;
+    }
+
+    private static void handleException(Model model, Exception e) throws Exception {
+        if (e instanceof JsonEOFException) {
+            model.addAttribute("errorMessage", "Unable to parse LLM response");
+        } else {
+            throw e;
+        }
     }
 }

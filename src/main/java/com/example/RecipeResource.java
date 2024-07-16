@@ -19,7 +19,7 @@ public class RecipeResource {
 
     @PostMapping("upload")
     public ResponseEntity<Void> addRecipeDocumentsForRag(@RequestParam("file") MultipartFile file) {
-        recipeService.addRecipeDocumentsForRag(file.getResource());
+        recipeService.addRecipeDocumentForRag(file.getResource());
         return ResponseEntity.noContent().build();
     }
 

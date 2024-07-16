@@ -35,3 +35,7 @@ ul,ol {
 #recipe-img {
     width: 100%;
 }
+
+#instructions {
+    list-style: none;
+}

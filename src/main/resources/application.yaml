@@ -5,6 +5,7 @@ spring:
     ollama:
       chat.model: llama3
       embedding.model: llama3
+      chat.options.temperature:
   servlet.multipart:
     max-file-size: 100MB
     max-request-size: 100MB
