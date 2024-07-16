@@ -3,9 +3,10 @@ spring:
   autoconfigure.exclude: org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfiguration
   ai:
     ollama:
-      chat.model: llama3
+      chat:
+        model: llama3
+        options.temperature: 1.0
       embedding.model: llama3
-      chat.options.temperature:
   servlet.multipart:
     max-file-size: 100MB
     max-request-size: 100MB
@@ -22,7 +23,9 @@ spring:
   config.activate.on-profile: azure
   autoconfigure.exclude: org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration
   ai.azure.openai:
-    chat.enabled: true
+    chat:
+      enabled: true
+      options.temperature: 1.0
     image.options:
       deployment-name: Dalle3
       model: dall-e-3

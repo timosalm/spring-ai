@@ -28,12 +28,12 @@ public class FetchIngredientsAvailableAtHomeFunction implements Function<FetchIn
     @Override
     public Response apply(Request request) {
         log.info("Fetching ingredients available at home function called by LLM");
-        var availableIngredients = Stream.concat(alwaysAvailableIngredients.stream(), availableIngredientsInFridge.stream()).toList();
+        var availableIngredients = Stream.concat(availableIngredientsInFridge.stream(),alwaysAvailableIngredients.stream()).toList();
         return new Response(availableIngredients);
     }
 
     public record Request(
             List<String> recipeIngredients) {}
 
-    public record Response(List<String> availableIngredients) {}
+    public record Response(List<String> ingredientsAvailableAtHome) {}
 }
