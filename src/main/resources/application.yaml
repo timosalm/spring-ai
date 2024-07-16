@@ -13,7 +13,7 @@ spring:
 server.tomcat.max-swallow-size: -1
 app:
   always-available-ingredients: wine,salt,pepper,olive oil,broth,rice
-  available-ingredients-in-fridge: salmon,zucchinis
+  available-ingredients-in-fridge: bacon,onions
 ---
 spring:
   config.activate.on-profile: ollama-compose
