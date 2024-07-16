@@ -1,6 +1,6 @@
 package com.example;
 
-import com.fasterxml.jackson.core.ErrorReportConfiguration;
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -8,6 +8,7 @@ import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
+import org.springframework.ai.model.function.FunctionCallingOptions;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +27,7 @@ public class RecipeService {
 
     private static final Logger log = LoggerFactory.getLogger(RecipeService.class);
 
-    private final ChatClient.Builder chatClientBuilder;
+    private final ChatClient chatClient;
     private final Optional<ImageModel> imageModel;
     private final VectorStore vectorStore;
 
@@ -38,13 +40,22 @@ public class RecipeService {
     @Value("classpath:/prompts/image-for-recipe")
     private Resource imageForRecipePromptResource;
 
-    public RecipeService(ChatClient.Builder chatClientBuilder, Optional<ImageModel> imageModel, VectorStore vectorStore) {
-        this.chatClientBuilder = chatClientBuilder;
+    public RecipeService(ChatClient chatClient, Optional<ImageModel> imageModel, VectorStore vectorStore) {
+        this.chatClient = chatClient;
         this.imageModel = imageModel;
         this.vectorStore = vectorStore;
     }
 
+    public void addRecipeDocumentForRag(Resource pdfResource) {
+        log.info("Add recipe document {} for rag", pdfResource.getFilename());
+        var documentReader = new PagePdfDocumentReader(pdfResource);
+        var documents = new TokenTextSplitter().apply(documentReader.get());
+        vectorStore.accept(documents);
+    }
+
     public Recipe fetchRecipeFor(List<String> ingredients, boolean preferAvailableIngredients, boolean preferOwnRecipes) {
+        setChatClientDefaults();
+
         Recipe recipe;
         if (!preferAvailableIngredients && !preferOwnRecipes) {
             recipe = fetchRecipeFor(ingredients);
@@ -70,7 +81,7 @@ public class RecipeService {
         var promptTemplate = new PromptTemplate(recipeForIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
 
-        return chatClientBuilder.build().prompt()
+        return chatClient.prompt()
                 .messages(promptMessage)
                 .call()
                 .entity(Recipe.class);
@@ -81,7 +92,7 @@ public class RecipeService {
         var promptTemplate = new PromptTemplate(recipeForAvailableIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
 
-        return chatClientBuilder.build().prompt()
+        return chatClient.prompt()
                 .messages(promptMessage)
                 .functions("fetchIngredientsAvailableAtHome")
                 .call()
@@ -93,7 +104,7 @@ public class RecipeService {
         var promptTemplate = new PromptTemplate(recipeForIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
 
-        return chatClientBuilder.build().prompt()
+        return chatClient.prompt()
                 .messages(promptMessage)
                 .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()))
                 .call()
@@ -105,7 +116,7 @@ public class RecipeService {
         var promptTemplate = new PromptTemplate(recipeForAvailableIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
 
-        return chatClientBuilder.build().prompt()
+        return chatClient.prompt()
                 .messages(promptMessage)
                 .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()))
                 .functions("fetchIngredientsAvailableAtHome")
@@ -113,10 +124,16 @@ public class RecipeService {
                 .entity(Recipe.class);
     }
 
-    public void addRecipeDocumentForRag(Resource pdfResource) {
-        log.info("Add recipe document {} for rag", pdfResource.getFilename());
-        var documentReader = new PagePdfDocumentReader(pdfResource);
-        var documents = new TokenTextSplitter().apply(documentReader.get());
-        vectorStore.accept(documents);
+    private void setChatClientDefaults() {
+        // Workaround: Configurations like function names for Function Calling will be saved between requests. Which means that once Function Calling is used, it is always configured.
+        try {
+            var defaultClientRequest = (ChatClient.ChatClientRequest) FieldUtils.readField(chatClient, "defaultChatClientRequest", true);
+            var chatOptions = FieldUtils.readField(defaultClientRequest, "chatOptions", true);
+            if (chatOptions instanceof FunctionCallingOptions) {
+                FieldUtils.writeField(chatOptions, "functions", new HashSet<String>(), true);
+            }
+        } catch (Exception e) {
+            log.info("Failed to set defaults for chat client request", e);
+        }
     }
 }

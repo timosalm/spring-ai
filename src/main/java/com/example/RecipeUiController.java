@@ -1,7 +1,5 @@
 package com.example;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.io.JsonEOFException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -11,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.Optional;
 
@@ -56,19 +53,10 @@ public class RecipeUiController {
     private String getAiModelNames() {
         var chatModelName = chatModel.getClass().getSimpleName().replace("ChatModel", "");
         var imageModelName = imageModel.map(
-                model -> model.getClass().getSimpleName().replace("ImageModel", "")).orElse("-");
-        if (chatModelName.equals(imageModelName)) {
+                model -> model.getClass().getSimpleName().replace("ImageModel", "")).orElse("");
+        if (chatModelName.equals(imageModelName) || imageModelName.isEmpty()) {
             return chatModelName;
         }
         return chatModelName + " & " + imageModelName;
-    }
-
-    private Recipe handleException(FetchRecipeData fetchRecipeData, Model model, Exception e) throws Exception {
-        if (e instanceof JsonEOFException || e instanceof JsonParseException || e instanceof IllegalStateException) {
-            log.info("Retry fetchRecipeFor after exception caused by LLM");
-            return recipeService.fetchRecipeFor(fetchRecipeData.ingredients(), fetchRecipeData.isPreferAvailableIngredients(), fetchRecipeData.isPreferOwnRecipes());
-        } else {
-            throw e;
-        }
     }
 }
