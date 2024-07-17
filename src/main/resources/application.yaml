@@ -1,6 +1,8 @@
 spring:
   application.name: RecipeFinder
-  autoconfigure.exclude: org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfiguration
+  autoconfigure.exclude: |
+    org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration,
+    org.springframework.ai.autoconfigure.azure.openai.AzureOpenAiAutoConfiguration
   ai:
     ollama:
       chat:
@@ -11,21 +13,7 @@ spring:
     max-file-size: 100MB
     max-request-size: 100MB
 server.tomcat.max-swallow-size: -1
+
 app:
   always-available-ingredients: wine,salt,pepper,olive oil,broth,rice
   available-ingredients-in-fridge: bacon,onions
----
-spring:
-  config.activate.on-profile: ollama-compose
-  docker.compose.profiles.active: ollama
----
-spring:
-  config.activate.on-profile: azure
-  autoconfigure.exclude: org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration
-  ai.azure.openai:
-    chat:
-      enabled: true
-      options.temperature: 1.0
-    image.options:
-      deployment-name: Dalle3
-      model: dall-e-3
