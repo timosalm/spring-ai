@@ -1,5 +1,7 @@
 # Spring AI Recipe Finder
 
+![](ui-sample.png)
+
 # Setup
 ## LLM
 ### Local LLM (Ollama)
@@ -54,6 +56,7 @@ As the functionalities to add always available ingredients and for the API call 
 
 Bacon and onions are currently configured for available ingredients in fridge.
 With the input "Potatoes", you should get a recipe with potatoes and bacon.
+![](ui-sample-function-calling.png)
 
 ## Retrieval-Augmented Generation(RAG)
 By checking the "Prefer own recipes" checkbox, [Retrieval-Augmented Generation](https://docs.spring.io/spring-ai/reference/1.0/concepts.html#concept-rag) will be enabled.
@@ -63,3 +66,4 @@ To upload your own PDF documents for recipes to the vector database, there is a 
 curl -XPOST -F "file=@$PWD/my-recipe.pdf" http://localhost:8080/api/v1/recipes/upload
 ```
 The sample recipe part of this repository is a potato soup. With the input "Potatoes", you should get a recipe that goes in the direction of a potato soup.
+![](ui-sample-rag.png)
