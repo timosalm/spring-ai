@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipe-finder-ollama
+spec:
+  selector:
+    matchLabels:
+      app: recipe-finder-ollama
+  template:
+    metadata:
+      labels:
+        app: recipe-finder-ollama
+    spec:
+      containers:
+        - env:
+            - name: SPRING_DOCKER_COMPOSE_ENABLED
+              value: "false"
+            - name: SPRING_AI_VECTORSTORE_REDIS_URI
+              value: redis://recipe-finder-redis:6379
+            - name: SPRING_AI_OLLAMA_BASE-URL
+              value: http://recipe-finder-ollama-llama3:11434
+          image: harbor.main.emea.end2end.link/tsalm/recipe-finder
+          name: workload
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recipe-finder-ollama
+spec:
+  type: LoadBalancer
+  selector:
+    app: recipe-finder-ollama
+  ports:
+    - port: 80
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipe-finder-ollama-llama3
+spec:
+  selector:
+    matchLabels:
+      app: recipe-finder-ollama-llama3
+  template:
+    metadata:
+      labels:
+        app: recipe-finder-ollama-llama3
+    spec:
+      containers:
+        - name: ollama
+          image: ollama/ollama
+        - name: ollama-init
+          image: ollama/ollama
+          command: [ "/bin/bash" ]
+          args:
+            - -c
+            - |
+              set -ex
+              sleep 10
+              ollama run llama3
+              sleep infinity
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recipe-finder-ollama-llama3
+spec:
+  type: ClusterIP
+  ports:
+    - port: 11434
+      targetPort: 11434
+  selector:
+    app: recipe-finder-ollama-llama3
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipe-finder-redis
+spec:
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        -   image: redis/redis-stack-server
+            name: workload
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recipe-finder-redis
+spec:
+  type: ClusterIP
+  selector:
+    app: redis
+  ports:
+    - port: 6379
+      targetPort: 6379

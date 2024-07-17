@@ -67,3 +67,22 @@ curl -XPOST -F "file=@$PWD/my-recipe.pdf" http://localhost:8080/api/v1/recipes/u
 ```
 The sample recipe part of this repository is a potato soup. With the input "Potatoes", you should get a recipe that goes in the direction of a potato soup.
 ![](ui-sample-rag.png)
+
+# Kubernetes Deployment
+
+## Ollama
+```
+kubectl apply -f deployment/kubernetes/ollama.yaml
+```
+
+## OpenAI
+```
+export SPRING_AI_AZURE_OPENAI_API_KEY=<INSERT KEY HERE>
+export SPRING_AI_AZURE_OPENAI_ENDPOINT=<INSERT ENDPOINT URL HERE>
+envsubst < deployment/kubernetes/openai.yaml | kubectl apply -f -
+```
+## Azure OpenAI
+```
+export SPRING_AI_OPENAI_API_KEY=<INSERT KEY HERE>
+envsubst < deployment/kubernetes/azure-openai.yaml | kubectl apply -f -
+```
