@@ -5,6 +5,8 @@ spring:
   ai.azure.openai:
     chat:
       options.temperature: 1.0
+      options:
+        deployment-name: gpt-4o
     image.options:
       deployment-name: Dalle3
       model: dall-e-3

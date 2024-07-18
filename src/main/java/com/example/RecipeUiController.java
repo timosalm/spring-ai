@@ -1,9 +1,13 @@
 package com.example;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.image.ImageModel;
+import org.springframework.ai.model.function.FunctionCallingOptions;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -17,6 +21,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import static org.springframework.util.StringUtils.capitalize;
 
 @Controller
 @RequestMapping("/")
@@ -38,7 +44,7 @@ public class RecipeUiController {
     public String fetchUI(Model model) {
         var aiModelNames = getAiModelNames();
         model.addAttribute("aiModel", String.join(" & ", aiModelNames));
-        model.addAttribute("preferAvailableIngredientsOptionEnabled", !aiModelNames.contains("Ollama"));
+        model.addAttribute("preferAvailableIngredientsOptionEnabled", aiModelNames.stream().noneMatch(s -> s.contains("Ollama")));
         if (!model.containsAttribute("fetchRecipeData")) {
             model.addAttribute("fetchRecipeData", new FetchRecipeData());
         }
@@ -59,12 +65,33 @@ public class RecipeUiController {
         return fetchUI(model);
     }
 
-    private Set<String> getAiModelNames() {
-        var modelNames = new HashSet<String>();
-        modelNames.add(chatModel.getClass().getSimpleName().replace("ChatModel", ""));
-        imageModel.map(
-                model -> model.getClass().getSimpleName().replace("ImageModel", "")
-        ).ifPresent(modelNames::add);
+    private List<String> getAiModelNames() {
+        var modelNames = new ArrayList<String>();
+        var chatModelProvider = chatModel.getClass().getSimpleName().replace("ChatModel", "");
+        var chatModelDefaultOptions = chatModel.getDefaultOptions();
+        try {
+            var modelName = (String)FieldUtils.readField(chatModelDefaultOptions, "model", true);
+            modelNames.add("%s (%s)".formatted(chatModelProvider, capitalize(modelName)));
+        } catch (Exception e1) {
+            try {
+                var modelName = (String)FieldUtils.readField(chatModelDefaultOptions, "deploymentName", true);
+                modelNames.add("%s (%s)".formatted(chatModelProvider, capitalize(modelName)));
+            } catch (Exception e2) {
+                modelNames.add(chatModelProvider);
+            }
+        }
+
+        if (imageModel.isPresent()) {
+            var imageModelProvider = imageModel.get().getClass().getSimpleName().replace("ImageModel", "");
+            try {
+                var imageModelDefaultOptions = FieldUtils.readField(imageModel.get(), "defaultOptions", true);
+                var imageModel = (String)FieldUtils.readField(imageModelDefaultOptions, "model", true);
+                modelNames.add("%s (%s)".formatted(imageModelProvider, capitalize(imageModel)));
+            } catch (Exception e) {
+                modelNames.add(imageModelProvider);
+            }
+        }
+
         return modelNames;
     }
 }
