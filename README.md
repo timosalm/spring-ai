@@ -2,6 +2,8 @@
 
 ![](ui-sample.png)
 
+[Slides: Building AI-Driven Spring Applications with Spring AI](slides.pdf)
+
 # Setup
 ## LLM
 ### Local LLM (Ollama)
