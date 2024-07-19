@@ -9,6 +9,8 @@ spring:
         model: llama3
         options.temperature: 1.0
       embedding.model: llama3
+    retry:
+      max-attempts:
   servlet.multipart:
     max-file-size: 100MB
     max-request-size: 100MB
