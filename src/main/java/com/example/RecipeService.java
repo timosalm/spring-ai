@@ -9,7 +9,9 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.model.function.FunctionCallingOptions;
+import org.springframework.ai.reader.ExtractedTextFormatter;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
+import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -31,6 +33,9 @@ public class RecipeService {
     private final Optional<ImageModel> imageModel;
     private final VectorStore vectorStore;
 
+    @Value("classpath:/prompts/grandmother-recipe-for-ingredients")
+    private Resource grandMotherRecipeForIngredientsPromptResource;
+
     @Value("classpath:/prompts/recipe-for-ingredients")
     private Resource recipeForIngredientsPromptResource;
 
@@ -48,7 +53,15 @@ public class RecipeService {
 
     public void addRecipeDocumentForRag(Resource pdfResource) {
         log.info("Add recipe document {} for rag", pdfResource.getFilename());
-        var documentReader = new PagePdfDocumentReader(pdfResource);
+        var documentReader = new PagePdfDocumentReader(pdfResource,
+        PdfDocumentReaderConfig.builder()
+                        .withPageTopMargin(0)
+                        .withPageExtractedTextFormatter(
+                                ExtractedTextFormatter.builder()
+                                        .withNumberOfTopTextLinesToDelete(0)
+                                        .build())
+                        .withPagesPerDocument(1)
+                        .build());
         var documents = new TokenTextSplitter().apply(documentReader.get());
         vectorStore.accept(documents);
     }
@@ -101,12 +114,12 @@ public class RecipeService {
 
     private Recipe fetchRecipeWithRagFor(List<String> ingredients) {
         log.info("Fetch recipe with additional information from vector store");
-        var promptTemplate = new PromptTemplate(recipeForIngredientsPromptResource);
+        var promptTemplate = new PromptTemplate(grandMotherRecipeForIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
 
         return chatClient.prompt()
                 .messages(promptMessage)
-                .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults().withTopK(20)))
+                .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults().withTopK(100)))
                 .call()
                 .entity(Recipe.class);
     }
@@ -118,7 +131,7 @@ public class RecipeService {
 
         return chatClient.prompt()
                 .messages(promptMessage)
-                .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults().withTopK(20)))
+                .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults().withTopK(100)))
                 .functions("fetchIngredientsAvailableAtHome")
                 .call()
                 .entity(Recipe.class);
