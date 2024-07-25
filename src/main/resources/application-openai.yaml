@@ -7,4 +7,3 @@ spring:
       options.temperature: 1.0
     image.options:
       model: dall-e-3
-    api-key:
