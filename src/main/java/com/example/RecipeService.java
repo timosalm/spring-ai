@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.prompt.PromptTemplate;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.model.function.FunctionCallingOptions;
@@ -23,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RecipeService {
@@ -35,6 +37,9 @@ public class RecipeService {
 
     @Value("classpath:/prompts/grandmother-recipe-for-ingredients")
     private Resource grandMotherRecipeForIngredientsPromptResource;
+    
+    @Value("classpath:/prompts/recipesystemprompt")
+    private Resource grandMotherRecipeSystemPrompt;
 
     @Value("classpath:/prompts/recipe-for-ingredients")
     private Resource recipeForIngredientsPromptResource;
@@ -116,10 +121,12 @@ public class RecipeService {
         log.info("Fetch recipe with additional information from vector store");
         var promptTemplate = new PromptTemplate(grandMotherRecipeForIngredientsPromptResource);
         var promptMessage = promptTemplate.createMessage(Map.of("ingredients", String.join(",", ingredients)));
-
+        SearchRequest query = SearchRequest.query(String.join(",", ingredients)).withTopK(2);
+        List<Document> similarRecipesDocuments = vectorStore.similaritySearch(query);
+        String documents = similarRecipesDocuments.stream().map(Document::getContent).collect(Collectors.toList()).toString();
         return chatClient.prompt()
                 .messages(promptMessage)
-                .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults().withTopK(100)))
+                .system(p -> p.text(grandMotherRecipeSystemPrompt).param("context", documents))
                 .call()
                 .entity(Recipe.class);
     }
