@@ -106,7 +106,7 @@ public class RecipeService {
 
         return chatClient.prompt()
                 .messages(promptMessage)
-                .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()))
+                .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults().withTopK(20)))
                 .call()
                 .entity(Recipe.class);
     }
@@ -118,7 +118,7 @@ public class RecipeService {
 
         return chatClient.prompt()
                 .messages(promptMessage)
-                .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults()))
+                .advisors(new QuestionAnswerAdvisor(vectorStore, SearchRequest.defaults().withTopK(20)))
                 .functions("fetchIngredientsAvailableAtHome")
                 .call()
                 .entity(Recipe.class);
