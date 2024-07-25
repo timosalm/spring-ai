@@ -1,6 +1,5 @@
+debug: true
 spring:
-  config:
-    import: "optional:classpath:/creds.yaml"
   application.name: RecipeFinder
   autoconfigure.exclude: |
     org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration,
