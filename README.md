@@ -40,10 +40,38 @@ Set the API key and endpoint via environment variables or in [application-azure.
 export SPRING_AI_AZURE_OPENAI_API_KEY=<INSERT KEY HERE>
 export SPRING_AI_AZURE_OPENAI_ENDPOINT=<INSERT ENDPOINT URL HERE>
 ```
+
+The `SPRING_AI_AZURE_OPENAI_ENDPOINT` being a URL that looks like this: https://anthony-test-ai.openai.azure.com
+
+Also, make sure the deployment model names match exactly what's in your `application-azure.yaml` configuration file.
+
+From the Azure Portal:
+![](azure-portal-ai-enpoint.png)
+
 Run your application with the "azure" Spring Profile.
 ```
 export SPRING_PROFILES_ACTIVE=azure
 ```
+
+## Caveat with Spring Azure regions
+
+Some regions do not support Images generation (Dall-E) models.
+
+![](azure-portal-unsupported-region.png)
+
+If you have to use such a region, make sure to disable explicitly the image generation in the project (otherwise you'll get errors)
+
+```yaml
+#    image.options:
+#      deployment-name: Dalle3
+#      model: dall-e-3
+  ai:
+    azure:
+      openai:
+        image:
+          enabled: false
+```
+
 ### Vector DB
 On your local machine, a Redis database is automatically started and configured with docker compose.
 
