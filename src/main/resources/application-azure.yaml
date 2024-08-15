@@ -8,7 +8,7 @@ spring:
       options:
         deployment-name: gpt-4o
     image.options:
-      deployment-name: Dalle3
+      deployment-name: dall-e-3
       model: dall-e-3
     api-key:
-    endpoint:
+    endpoint: https://{your-resource-name}.openai.azure.com
