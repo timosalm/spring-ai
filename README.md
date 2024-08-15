@@ -46,8 +46,9 @@ Make sure the deployment names of the models match exactly what's in your [appli
 Currently, [**only some regions support image generation** with Dall-E](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#dall-e-models).
 If you use a region that doesn't support it, you have to disable the image generation by setting `ai.azure.openai.image.enabled: false` in the [application-azure.yaml](src/main/resources/application-azure.yaml) configuration file to not run into errors.
 
-```
 Run your application with the "azure" Spring Profile.
+```
+export SPRING_PROFILES_ACTIVE=azure
 ```
 
 ### Vector DB
