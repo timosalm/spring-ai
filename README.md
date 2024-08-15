@@ -3,7 +3,7 @@
 Demo on how easy it is to build AI-driven applications with Spring Boot and Spring AI. 
 It also shows how to implement advanced techniques for the adaption of foundation models with Function Calling and RAG.
 
-![](ui-sample.png)
+![](docs/images/ui-sample.png)
 
 [Slides: Building AI-Driven Spring Applications with Spring AI](slides.pdf)
 
@@ -38,39 +38,13 @@ export SPRING_PROFILES_ACTIVE=openai
 Set the API key and endpoint via environment variables or in [application-azure.yaml](src/main/resources/application-azure.yaml).
 ```
 export SPRING_AI_AZURE_OPENAI_API_KEY=<INSERT KEY HERE>
-export SPRING_AI_AZURE_OPENAI_ENDPOINT=<INSERT ENDPOINT URL HERE>
+export SPRING_AI_AZURE_OPENAI_ENDPOINT=https://{your-resource-name}.openai.azure.com
 ```
 
-The `SPRING_AI_AZURE_OPENAI_ENDPOINT` being a URL that looks like this: https://anthony-test-ai.openai.azure.com
+Make sure the deployment names of the models match exactly what's in your [application-azure.yaml](src/main/resources/application-azure.yaml) configuration file.
 
-Also, make sure the deployment model names match exactly what's in your `application-azure.yaml` configuration file.
-
-From the Azure Portal:
-![](azure-portal-ai-enpoint.png)
-
-Run your application with the "azure" Spring Profile.
-```
-export SPRING_PROFILES_ACTIVE=azure
-```
-
-## Caveat with Spring Azure regions
-
-Some regions do not support Images generation (Dall-E) models.
-
-![](azure-portal-unsupported-region.png)
-
-If you have to use such a region, make sure to disable explicitly the image generation in the project (otherwise you'll get errors)
-
-```yaml
-#    image.options:
-#      deployment-name: Dalle3
-#      model: dall-e-3
-  ai:
-    azure:
-      openai:
-        image:
-          enabled: false
-```
+Currently, [**only some regions support image generation** with Dall-E](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#dall-e-models).
+If you use a region that doesn't support it, you have to disable the image generation by setting `ai.azure.openai.image.enabled: false` in the [application-azure.yaml](src/main/resources/application-azure.yaml) configuration file to not run into errors.
 
 ### Vector DB
 On your local machine, a Redis database is automatically started and configured with docker compose.
@@ -89,7 +63,7 @@ As the functionalities to add always available ingredients and for the API call 
 
 Bacon and onions are currently configured for available ingredients in fridge.
 With the input "Potatoes", you should get a recipe with potatoes and bacon.
-![](ui-sample-function-calling.png)
+![](docs/images/ui-sample-function-calling.png)
 
 ## Retrieval-Augmented Generation(RAG)
 By checking the "Prefer own recipes" checkbox, [Retrieval-Augmented Generation](https://docs.spring.io/spring-ai/reference/1.0/concepts.html#concept-rag) will be enabled.
@@ -99,7 +73,7 @@ To upload your own PDF documents for recipes to the vector database, there is a 
 curl -XPOST -F "file=@$PWD/my-recipe.pdf" http://localhost:8080/api/v1/recipes/upload
 ```
 The sample recipe part of this repository is a potato soup. With the input "Potatoes", you should get a recipe that goes in the direction of a potato soup.
-![](ui-sample-rag.png)
+![](docs/images/ui-sample-rag.png)
 
 # Kubernetes Deployment
 
