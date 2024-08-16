@@ -5,7 +5,7 @@ It also shows how to implement advanced techniques for the adaption of foundatio
 
 ![](docs/images/ui-sample.png)
 
-[Slides: Building AI-Driven Spring Applications with Spring AI](slides.pdf)
+[Slides: Building AI-Driven Spring Applications with Spring AI](docs/slides.pdf)
 
 # Setup
 ## LLM

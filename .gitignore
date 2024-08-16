@@ -39,8 +39,3 @@ out/
 ### VS Code ###
 .vscode/
 .env
-
-
-# Exclude creds.yaml
-creds.yaml
-.DS_Store
