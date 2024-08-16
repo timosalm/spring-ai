@@ -1,1 +1,10 @@
-Generate a picture of the served meal based on the recipe "{recipe}" and its ingredients "{ingredients}"
+Generate a picture of the served meal based on the recipe and its ingredients.
+
+Recipe: """
+{recipe}
+"""
+
+Ingredients: """
+{ingredients}
+"""
+

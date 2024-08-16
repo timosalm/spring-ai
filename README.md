@@ -75,7 +75,7 @@ By checking the "Prefer own recipes" checkbox, [Retrieval-Augmented Generation](
 
 To upload your own PDF documents for recipes to the vector database, there is a REST API endpoint implemented. 
 ```
-curl -XPOST -F "file=@$PWD/my-recipe.pdf" http://localhost:8080/api/v1/recipes/upload
+curl -XPOST -F "file=@$PWD/german_recipes.pdf" http://localhost:8080/api/v1/recipes/upload
 ```
 The sample recipe part of this repository is a potato soup. With the input "Potatoes", you should get a recipe that goes in the direction of a potato soup.
 ![](docs/images/ui-sample-rag.png)
