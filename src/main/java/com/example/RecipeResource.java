@@ -18,8 +18,10 @@ public class RecipeResource {
     }
 
     @PostMapping("upload")
-    public ResponseEntity<Void> addRecipeDocumentsForRag(@RequestParam("file") MultipartFile file) {
-        recipeService.addRecipeDocumentForRag(file.getResource());
+    public ResponseEntity<Void> addRecipeDocumentsForRag(@RequestParam("file") MultipartFile file,
+                                                         @RequestParam(required = false, defaultValue = "0") int pageTopMargin,
+                                                         @RequestParam(required = false, defaultValue = "0") int pageBottomMargin) {
+        recipeService.addRecipeDocumentForRag(file.getResource(), pageTopMargin, pageBottomMargin);
         return ResponseEntity.noContent().build();
     }
 

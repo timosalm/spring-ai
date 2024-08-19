@@ -1,4 +1,5 @@
 If one of the following recipes includes those ingredients, provide one of these recipes unchanged!
+Remove any text formatting like uppercase.
 
 Recipes: """
 {question_answer_context}

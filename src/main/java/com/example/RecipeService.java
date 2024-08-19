@@ -10,6 +10,7 @@ import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.model.function.FunctionCallingOptions;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
+import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -49,9 +50,13 @@ public class RecipeService {
         this.vectorStore = vectorStore;
     }
 
-    public void addRecipeDocumentForRag(Resource pdfResource) {
+    public void addRecipeDocumentForRag(Resource pdfResource, int pageTopMargin, int pageBottomMargin) {
         log.info("Add recipe document {} for rag", pdfResource.getFilename());
-        var documentReader = new PagePdfDocumentReader(pdfResource);
+        var documentReaderConfig = PdfDocumentReaderConfig.builder()
+                .withPageTopMargin(pageTopMargin)
+                .withPageBottomMargin(pageBottomMargin)
+                .build();
+        var documentReader = new PagePdfDocumentReader(pdfResource, documentReaderConfig);
         var documents = new TokenTextSplitter().apply(documentReader.get());
         vectorStore.accept(documents);
     }
