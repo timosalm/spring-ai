@@ -8,6 +8,7 @@ public class FetchRecipeData {
     private String ingredientsStr;
     private boolean preferAvailableIngredients = false;
     private boolean preferOwnRecipes = false;
+    private boolean scanMyDish = false;
 
     public List<String> ingredients() {
         return Arrays.asList(ingredientsStr.split("\\s*,\\s*"));
@@ -35,5 +36,13 @@ public class FetchRecipeData {
 
     public void setPreferOwnRecipes(boolean preferOwnRecipes) {
         this.preferOwnRecipes = preferOwnRecipes;
+    }
+
+    public boolean isScanMyDish() {
+        return scanMyDish;
+    }
+
+    public void setScanMyDish(boolean scanMyDish) {
+        this.scanMyDish = scanMyDish;
     }
 }

@@ -48,10 +48,10 @@ public class RecipeUiController {
     public String fetchRecipeUiFor(FetchRecipeData fetchRecipeData, Model model) throws Exception {
         Recipe recipe;
         try {
-            recipe = recipeService.fetchRecipeFor(fetchRecipeData.ingredients(), fetchRecipeData.isPreferAvailableIngredients(), fetchRecipeData.isPreferOwnRecipes());
+            recipe = recipeService.fetchRecipeFor(fetchRecipeData.ingredients(), fetchRecipeData.isPreferAvailableIngredients(), fetchRecipeData.isPreferOwnRecipes(), fetchRecipeData.isScanMyDish());
         } catch (Exception e) {
             log.info("Retry RecipeUiController:fetchRecipeFor after exception caused by LLM");
-            recipe = recipeService.fetchRecipeFor(fetchRecipeData.ingredients(), fetchRecipeData.isPreferAvailableIngredients(), fetchRecipeData.isPreferOwnRecipes());
+            recipe = recipeService.fetchRecipeFor(fetchRecipeData.ingredients(), fetchRecipeData.isPreferAvailableIngredients(), fetchRecipeData.isPreferOwnRecipes(), fetchRecipeData.isScanMyDish());
         }
         model.addAttribute("recipe", recipe);
         model.addAttribute("fetchRecipeData", fetchRecipeData);

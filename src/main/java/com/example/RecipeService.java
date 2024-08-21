@@ -17,7 +17,11 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeTypeUtils;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -61,15 +65,18 @@ public class RecipeService {
         vectorStore.accept(documents);
     }
 
-    public Recipe fetchRecipeFor(List<String> ingredients, boolean preferAvailableIngredients, boolean preferOwnRecipes) {
+    public Recipe fetchRecipeFor(List<String> ingredients, boolean preferAvailableIngredients, boolean preferOwnRecipes, boolean scanMyDish) {
         setChatClientDefaults();
 
         Recipe recipe;
-        if (!preferAvailableIngredients && !preferOwnRecipes) {
+
+        if (!preferAvailableIngredients && !preferOwnRecipes && !scanMyDish) {
             recipe = fetchRecipeFor(ingredients);
-        } else if (preferAvailableIngredients && !preferOwnRecipes) {
+        } else if (!preferAvailableIngredients && !preferOwnRecipes && scanMyDish) {
+            recipe = fetchRecipeFromImageUrl(ingredients);
+        }else if (preferAvailableIngredients && !preferOwnRecipes && !scanMyDish) {
             recipe = fetchRecipeWithFunctionCallingFor(ingredients);
-        } else if (!preferAvailableIngredients && preferOwnRecipes) {
+        } else if (!preferAvailableIngredients && preferOwnRecipes && !scanMyDish) {
             recipe = fetchRecipeWithRagFor(ingredients);
         } else {
             recipe = fetchRecipeWithRagAndFunctionCallingFor(ingredients);
@@ -132,6 +139,26 @@ public class RecipeService {
                 .user(promptTemplate.render())
                 .functions("fetchIngredientsAvailableAtHome")
                 .advisors(new QuestionAnswerAdvisor(vectorStore, advisorSearchRequest, advise))
+                .call()
+                .entity(Recipe.class);
+    }
+
+    private Recipe fetchRecipeFromImageUrl(List<String> ingredients) {
+        log.info(ingredients.getFirst());
+
+        return chatClient.prompt()
+                .user(us -> {
+                    try {
+                        us
+                                .text("The following image is a dish, you have to find out what is this dish and then provide the recipe for this dish").media(MimeTypeUtils.IMAGE_JPEG, new URI(ingredients.getFirst()).toURL());
+                    } catch (MalformedURLException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    } catch (URISyntaxException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                })
                 .call()
                 .entity(Recipe.class);
     }

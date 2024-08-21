@@ -4,6 +4,7 @@ spring:
     org.springframework.ai.autoconfigure.ollama.OllamaAutoConfiguration
   ai.openai:
     chat:
+      options.model: gpt-4o
       options.temperature: 1.0
     image.options:
       model: dall-e-3

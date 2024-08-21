@@ -1,3 +1,4 @@
+debug: true
 spring:
   application.name: RecipeFinder
   autoconfigure.exclude: |
