@@ -36,7 +36,10 @@
                                 <input type="checkbox" id="prefer-own-recipes" th:field="*{preferOwnRecipes}" />
                                 <label for="prefer-own-recipes">Prefer own recipes</label>
                                 <input type="checkbox" id="scan-my-dish" th:field="*{scanMyDish}" />
-                                <label for="scan-my-dish">Scan my dish</label>
+                                <label for="scan-my-dish" id="scan-my-dish-available-label">Scan my dish</label>
+                                <div id="scan-my-dish-tooltip" class="tooltip"><svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="17.93" cy="11.9" r="1.4"></circle><path d="M21,23H19V15H16a1,1,0,0,0,0,2h1v6H15a1,1,0,1,0,0,2h6a1,1,0,0,0,0-2Z"></path><path d="M18,6A12,12,0,1,0,30,18,12,12,0,0,0,18,6Zm0,22A10,10,0,1,1,28,18,10,10,0,0,1,18,28Z"></path></svg>
+                                    <span class="tooltiptext">Image recognition is not supported by Ollama</span>
+                                </div>
                                 <button type="submit">Find</button>
                             </form>
 
@@ -74,8 +77,11 @@
     if (!preferAvailableIngredientsOptionEnabled) {
         document.getElementById('prefer-available').disabled = true;
         document.getElementById('prefer-available-label').classList.add('disabled');
+        document.getElementById('scan-my-dish').disabled = true;
+        document.getElementById('scan-my-dish-label').classList.add('disabled');
     } else {
         document.getElementById('prefer-available-tooltip').style.display = "none";
+        document.getElementById('scan-my-dish-tooltip').style.display = "none";
     }
     /*]]>*/
 </script>
