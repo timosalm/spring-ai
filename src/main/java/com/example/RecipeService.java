@@ -48,6 +48,7 @@ public class RecipeService {
     @Value("classpath:/prompts/image-for-recipe")
     private Resource imageForRecipePromptResource;
 
+
     public RecipeService(ChatClient chatClient, Optional<ImageModel> imageModel, VectorStore vectorStore) {
         this.chatClient = chatClient;
         this.imageModel = imageModel;
@@ -149,8 +150,12 @@ public class RecipeService {
         return chatClient.prompt()
                 .user(us -> {
                     try {
-                        us
-                                .text("The following image is a dish, you have to find out what is this dish and then provide the recipe for this dish").media(MimeTypeUtils.IMAGE_JPEG, new URI(ingredients.getFirst()).toURL());
+                        us.text("""
+                                    The following image is a dish,
+                                    you have to find out what is this dish and then provide the recipe for this dish
+                                    """)
+                                .media(MimeTypeUtils.IMAGE_JPEG, new URI(ingredients.getFirst()).toURL());
+
                     } catch (MalformedURLException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();

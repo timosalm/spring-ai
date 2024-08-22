@@ -65,12 +65,26 @@
                                 </table>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<footer class="card-footer" id="footer">
+    <div id="Chatbot" class="tabcontent">
+        <div id="chat-container">
+            <div id="chat-history" style="background-color: #f6f0f0;" >
+                <!-- Chat history will be dynamically loaded here -->
+            </div>
+            <form id="chat-form" onsubmit="chatWithBot(event)">
+                <input type="text" id="user-input" name="question" placeholder="Type your question...">
+                <button class="btn btn-primary ml-2" type="submit">Chat with the chef!</button>
+            </form>
+        </div>
+    </div>
+</footer>
 <script th:inline="javascript">
     /*<![CDATA[*/
     var preferAvailableIngredientsOptionEnabled = /*[[${preferAvailableIngredientsOptionEnabled}]]*/ 'false';
@@ -84,6 +98,41 @@
         document.getElementById('scan-my-dish-tooltip').style.display = "none";
     }
     /*]]>*/
+    function chatWithBot(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            var question = document.getElementById('user-input').value;
+            if (question.trim() === '') {
+                return; // Do not send empty questions
+            }
+
+            // Make an AJAX request to chatbot API
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        var response = xhr.responseText;
+
+                        // Display the user question and bot response in chat history
+                        var chatHistory = document.getElementById('chat-history');
+                        var userMessage = document.createElement('div');
+                        userMessage.innerHTML = '<strong>You</strong>: ' + question;
+                        chatHistory.appendChild(userMessage);
+
+                        var botMessage = document.createElement('div');
+                        botMessage.innerHTML = '<strong>Chef</strong>:' + response;
+                        chatHistory.appendChild(botMessage);
+
+                        // Clear input field
+                        document.getElementById('user-input').value = '';
+                    } else {
+                        console.error('Error fetching chatbot response');
+                    }
+                }
+            };
+            xhr.open('GET', 'api/v1/chat?q=' + encodeURIComponent(question));
+            xhr.send();
+        }
 </script>
 </body>
 </html>
