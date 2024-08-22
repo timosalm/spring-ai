@@ -1,4 +1,5 @@
-If one of the following recipes is matching a customer request, give it to the customer unchanged and mention it comes from your cookbook.
+If a customer is asking you for a recipe, look at the recipes below to see if one matches the request.
+If one recipe is matching, give it to the customer unchanged and mention it comes from your cookbook.
 
 Recipes: """
 {question_answer_context}
