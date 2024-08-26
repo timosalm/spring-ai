@@ -13,7 +13,7 @@ It also shows how to implement advanced techniques for the adaption of foundatio
 As Ollama doesn't yet provide a text-to-image model, recipe image generation is not available with this setup.
 #### Option 1
 1. Download and install Ollama on your local machine [link](https://ollama.com/)
-2. Start llama3.1 model (3.1 is the first Llama version that supports Function Calling)
+2. Start llama3.1 model (3.1 is the first Llama version that supports Function Calling, even if it's not working well with the 8B version)
     ```
     ollama run llama3.1
     ```

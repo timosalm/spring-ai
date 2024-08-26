@@ -32,8 +32,7 @@ public class FetchIngredientsAvailableAtHomeFunction implements Function<FetchIn
         return new Response(availableIngredients);
     }
 
-    public record Request(
-            List<String> recipeIngredients) {}
+    public record Request() {}
 
     public record Response(List<String> ingredientsAvailableAtHome) {}
 }
