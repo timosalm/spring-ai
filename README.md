@@ -11,12 +11,11 @@ It also shows how to implement advanced techniques for the adaption of foundatio
 ## LLM
 ### Local LLM (Ollama)
 As Ollama doesn't yet provide a text-to-image model, recipe image generation is not available with this setup.
-Also Function calling is not supported by the Ollama models.
 #### Option 1
 1. Download and install Ollama on your local machine [link](https://ollama.com/)
-2. Start llama3 model
+2. Start llama3.1 model (3.1 is the first Llama version that supports Function Calling)
     ```
-    ollama run llama3
+    ollama run llama3.1
     ```
 #### Option 2
 By enabling the "ollama-compose" Spring profile, the llama3 model will be automatically started and configured with docker compose.

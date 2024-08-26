@@ -62,8 +62,6 @@ public class RecipeService {
     }
 
     public Recipe fetchRecipeFor(List<String> ingredients, boolean preferAvailableIngredients, boolean preferOwnRecipes) {
-        setChatClientDefaults();
-
         Recipe recipe;
         if (!preferAvailableIngredients && !preferOwnRecipes) {
             recipe = fetchRecipeFor(ingredients);
@@ -134,18 +132,5 @@ public class RecipeService {
                 .advisors(new QuestionAnswerAdvisor(vectorStore, advisorSearchRequest, advise))
                 .call()
                 .entity(Recipe.class);
-    }
-
-    private void setChatClientDefaults() {
-        // Workaround: Configurations like function names for Function Calling will be saved between requests. Which means that once Function Calling is used, it is always configured.
-        try {
-            var defaultClientRequest = (ChatClient.ChatClientRequest) FieldUtils.readField(chatClient, "defaultChatClientRequest", true);
-            var chatOptions = FieldUtils.readField(defaultClientRequest, "chatOptions", true);
-            if (chatOptions instanceof FunctionCallingOptions) {
-                FieldUtils.writeField(chatOptions, "functions", new HashSet<String>(), true);
-            }
-        } catch (Exception e) {
-            log.info("Failed to set defaults for chat client request", e);
-        }
     }
 }

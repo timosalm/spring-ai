@@ -30,9 +30,6 @@
                                 <input type="text" id="ingredients" th:field="*{ingredientsStr}" />
                                 <input type="checkbox" id="prefer-available" th:field="*{preferAvailableIngredients}"  />
                                 <label for="prefer-available" id="prefer-available-label">Use available ingredients</label>
-                                <div id="prefer-available-tooltip" class="tooltip"><svg viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="17.93" cy="11.9" r="1.4"></circle><path d="M21,23H19V15H16a1,1,0,0,0,0,2h1v6H15a1,1,0,1,0,0,2h6a1,1,0,0,0,0-2Z"></path><path d="M18,6A12,12,0,1,0,30,18,12,12,0,0,0,18,6Zm0,22A10,10,0,1,1,28,18,10,10,0,0,1,18,28Z"></path></svg>
-                                    <span class="tooltiptext">Function Calling is not supported by Ollama</span>
-                                </div>
                                 <input type="checkbox" id="prefer-own-recipes" th:field="*{preferOwnRecipes}" />
                                 <label for="prefer-own-recipes">Prefer own recipes</label>
                                 <button type="submit">Find</button>
@@ -66,16 +63,5 @@
         </div>
     </div>
 </div>
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    var preferAvailableIngredientsOptionEnabled = /*[[${preferAvailableIngredientsOptionEnabled}]]*/ 'false';
-    if (!preferAvailableIngredientsOptionEnabled) {
-        document.getElementById('prefer-available').disabled = true;
-        document.getElementById('prefer-available-label').classList.add('disabled');
-    } else {
-        document.getElementById('prefer-available-tooltip').style.display = "none";
-    }
-    /*]]>*/
-</script>
 </body>
 </html>

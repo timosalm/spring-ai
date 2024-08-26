@@ -37,7 +37,6 @@ public class RecipeUiController {
     public String fetchUI(Model model) {
         var aiModelNames = getAiModelNames();
         model.addAttribute("aiModel", String.join(" & ", aiModelNames));
-        model.addAttribute("preferAvailableIngredientsOptionEnabled", aiModelNames.stream().noneMatch(s -> s.contains("Ollama")));
         if (!model.containsAttribute("fetchRecipeData")) {
             model.addAttribute("fetchRecipeData", new FetchRecipeData());
         }

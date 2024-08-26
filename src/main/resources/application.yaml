@@ -6,9 +6,9 @@ spring:
   ai:
     ollama:
       chat:
-        model: llama3
+        model: llama3.1
         options.temperature: 1.0
-      embedding.model: llama3
+      embedding.model: llama3.1
     vectorstore.redis.initialize-schema: true
   servlet.multipart:
     max-file-size: 100MB

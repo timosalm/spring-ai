@@ -4,7 +4,7 @@ services:
     ports:
       - 6379
   ollama:
-    image: "ollama/ollama"
+    image: "ollama/ollama:0.3.6"
     container_name: ollama
     profiles:
       - ollama
@@ -20,6 +20,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     restart: on-failure
-    command: docker exec ollama ollama run llama3
+    command: docker exec ollama ollama run llama3.1
     depends_on:
       - ollama
