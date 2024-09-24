@@ -1,6 +1,7 @@
-If a customer is asking you for a recipe, look at the recipes below to see if one matches the request.
-If one recipe is matching, give it to the customer unchanged and mention it comes from your cookbook.
+If a customer is asking you for a recipe, look at the context below to see if one matches the request.
+Only use this context when customer asks for recipes
 
-Recipes: """
+Context:
+"""
 {question_answer_context}
 """

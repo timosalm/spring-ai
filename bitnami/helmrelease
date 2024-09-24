@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: redis-stack-server
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: redis # no alias, just the chart name
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+      interval: 12h
+  values:
+    global:
+      defaultStorageClass: "gp2"
+    networkPolicy:
+      enabled: false  # Disable the network policies
+    auth:
+      enabled: false
+    image:
+      repository: "redis/redis-stack-server"
+      tag: "latest"
+      debug: true
+    commonConfiguration: |-
+      loadmodule /opt/redis-stack/lib/redisearch.so
+      loadmodule /opt/redis-stack/lib/redistimeseries.so
+      loadmodule /opt/redis-stack/lib/rediscompat.so
+      loadmodule /opt/redis-stack/lib/rejson.so

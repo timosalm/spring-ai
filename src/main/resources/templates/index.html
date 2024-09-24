@@ -73,7 +73,7 @@
     </div>
 </div>
 <footer class="card-footer" id="footer">
-    <div id="Chatbot" class="tabcontent">
+    <div id="Chatbot" class="chatbox">
         <div id="chat-container">
             <div id="chat-history" style="background-color: #f6f0f0;" >
                 <!-- Chat history will be dynamically loaded here -->
@@ -97,42 +97,56 @@
         document.getElementById('prefer-available-tooltip').style.display = "none";
         document.getElementById('scan-my-dish-tooltip').style.display = "none";
     }
-    /*]]>*/
-    function chatWithBot(event) {
-            event.preventDefault(); // Prevent default form submission
 
-            var question = document.getElementById('user-input').value;
-            if (question.trim() === '') {
-                return; // Do not send empty questions
+    // This is the async function
+    async function chatWithBot(event) {
+        event.preventDefault(); // Prevent default form submission
+
+        var question = document.getElementById('user-input').value;
+        if (question.trim() === '') {
+            return; // Do not send empty questions
+        }
+
+        // Add user's question to the chat history
+        var chatHistory = document.getElementById('chat-history');
+        var userMessage = document.createElement('div');
+        userMessage.innerHTML = '<strong>You</strong>: ' + question;
+        userMessage.className = 'chat-bubble user';
+        chatHistory.appendChild(userMessage);
+
+        // Fetch streaming data from the server
+        try {
+            const response = await fetch('api/v1/chat?q=' + encodeURIComponent(question));
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
 
-            // Make an AJAX request to chatbot API
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE) {
-                    if (xhr.status === 200) {
-                        var response = xhr.responseText;
+            // Process streaming response
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder("utf-8");
+            let botMessage = document.createElement('div');
+            botMessage.innerHTML = '<strong>Chef</strong>: ';
+            botMessage.className = 'chat-bubble bot';
+            chatHistory.appendChild(botMessage);
 
-                        // Display the user question and bot response in chat history
-                        var chatHistory = document.getElementById('chat-history');
-                        var userMessage = document.createElement('div');
-                        userMessage.innerHTML = '<strong>You</strong>: ' + question;
-                        chatHistory.appendChild(userMessage);
+            // Read the stream as it comes in and append to bot's message
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
 
-                        var botMessage = document.createElement('div');
-                        botMessage.innerHTML = '<strong>Chef</strong>:' + response;
-                        chatHistory.appendChild(botMessage);
+                botMessage.innerHTML += decoder.decode(value, { stream: true });
+            }
 
-                        // Clear input field
-                        document.getElementById('user-input').value = '';
-                    } else {
-                        console.error('Error fetching chatbot response');
-                    }
-                }
-            };
-            xhr.open('GET', 'api/v1/chat?q=' + encodeURIComponent(question));
-            xhr.send();
+        } catch (error) {
+            console.error('Error fetching chatbot response:', error);
         }
+
+        // Clear the input field
+        document.getElementById('user-input').value = '';
+    }
+
+    /*]]>*/
 </script>
 </body>
 </html>

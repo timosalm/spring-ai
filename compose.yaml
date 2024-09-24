@@ -2,7 +2,19 @@ services:
   redis:
     image: "redis/redis-stack-server"
     ports:
-      - 6379
+      - 6379:6379
+    #environment:
+      #REDIS_ARGS: "--requirepass root"
+
+  #neo4j:
+   # image: neo4j:latest
+   # ports:
+    #  - "7474:7474"
+     # - "7687:7687"
+    #environment:
+    #  - NEO4J_AUTH=neo4j/brahmsian
+     # - NEO4J_PLUGINS=["apoc"]
+
   ollama:
     image: "ollama/ollama"
     container_name: ollama

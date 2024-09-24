@@ -10,6 +10,8 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+
 
 @Service
 public class ChefService {
@@ -29,16 +31,15 @@ public class ChefService {
     }
 
 
-    public String answerCustomerQuestion(String question) {
+    public Flux<String> answerCustomerQuestion(String question) {
         log.info("Answering question from Chat");
-        var advisorSearchRequest = SearchRequest.query(question);
+        var advisorSearchRequest = SearchRequest.query(question).withTopK(1).withSimilarityThreshold(0.8);
         var advise = new PromptTemplate(chefCookBook).getTemplate();
         return chatClient.prompt()
                         .system(chef)
                         .user(question)
                         .advisors(new QuestionAnswerAdvisor(vectorStore, advisorSearchRequest, advise))
-                        .call()
-                        .content();
+                        .stream().content();
     }
 
 }

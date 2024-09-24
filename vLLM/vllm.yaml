@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm
+  labels:
+    app: vllm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vllm
+  template:
+    metadata:
+      labels:
+        app: vllm
+    spec:
+      nodeSelector:
+        "node.kubernetes.io/instance-type": "g4dn.xlarge"
+      tolerations:
+        - key: nvidia.com/gpu
+          operator: Exists
+          effect: NoSchedule
+      volumes:
+        - emptyDir:
+            medium: Memory
+            sizeLimit: 2Gi
+          name: cache-volume
+      containers:
+        - name: vllm
+          image: vllm/vllm-openai:v0.4.1
+          resources:
+            limits:
+              memory: "16Gi"
+              cpu: "4"
+              nvidia.com/gpu: 1
+            requests:
+              memory: "8Gi"
+              cpu: "2"
+              nvidia.com/gpu: 1
+          # define probe to check if the container is ready
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 10
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            periodSeconds: 15
+            successThreshold: 1
+            failureThreshold: 10
+          args:
+            # full list of arguments: https://docs.vllm.ai/en/latest/models/engine_args.html
+            - --model=mistralai/Mistral-7B-Instruct-v0.2
+            - --max-model-len=1850 # limit context window to 16k tokens to save memory
+            - --dtype=half
+            - --gpu-memory-utilization=1
+            - --enforce-eager
+          env:
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: huggingface-token
+                  key: token
+          volumeMounts:
+            - mountPath: /dev/shm
+              name: cache-volume
+          ports:
+            - containerPort: 8000
+              name: http
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vllm
+  labels:
+    app: vllm
+spec:
+  selector:
+    app: vllm
+  ports:
+    - protocol: TCP
+      port: 8000
+      name: http
+  type: ClusterIP

@@ -1,0 +1,8 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: bitnami
+spec:
+  interval: 12h
+  type: oci
+  url: oci://registry-1.docker.io/bitnamicharts # registry URL without the chart name

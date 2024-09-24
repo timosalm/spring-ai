@@ -1,5 +1,7 @@
 debug: true
+
 spring:
+  data:
   application.name: RecipeFinder
   autoconfigure.exclude: |
     org.springframework.ai.autoconfigure.openai.OpenAiAutoConfiguration,
@@ -10,7 +12,9 @@ spring:
         model: llama3
         options.temperature: 1.0
       embedding.model: llama3
-    vectorstore.redis.initialize-schema: true
+    vectorstore:
+      redis:
+        initialize-schema: true
   servlet.multipart:
     max-file-size: 100MB
     max-request-size: 100MB

@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
@@ -14,6 +15,7 @@ import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashSet;
+import static org.springframework.util.StringUtils.capitalize;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,6 +36,7 @@ public class RecipeService {
     private static final Logger log = LoggerFactory.getLogger(RecipeService.class);
 
     private final ChatClient chatClient;
+    private final ChatModel chatModel;
     private final Optional<ImageModel> imageModel;
     private final VectorStore vectorStore;
 
@@ -49,10 +53,11 @@ public class RecipeService {
     private Resource imageForRecipePromptResource;
 
 
-    public RecipeService(ChatClient chatClient, Optional<ImageModel> imageModel, VectorStore vectorStore) {
+    public RecipeService(ChatClient chatClient, Optional<ImageModel> imageModel, VectorStore vectorStore, ChatModel chatModel) {
         this.chatClient = chatClient;
         this.imageModel = imageModel;
         this.vectorStore = vectorStore;
+        this.chatModel = chatModel;
     }
 
     public void addRecipeDocumentForRag(Resource pdfResource, int pageTopMargin, int pageBottomMargin) {
@@ -66,10 +71,11 @@ public class RecipeService {
         vectorStore.accept(documents);
     }
 
-    public Recipe fetchRecipeFor(List<String> ingredients, boolean preferAvailableIngredients, boolean preferOwnRecipes, boolean scanMyDish) {
-        setChatClientDefaults();
+    public Recipe fetchRecipeFor(List<String> ingredients, boolean preferAvailableIngredients, boolean preferOwnRecipes, boolean scanMyDish) throws IllegalAccessException {
+        //setChatClientDefaults();
 
         Recipe recipe;
+        var mychatmodel = (String)FieldUtils.readField(chatModel.getDefaultOptions(), "model", true);
 
         if (!preferAvailableIngredients && !preferOwnRecipes && !scanMyDish) {
             recipe = fetchRecipeFor(ingredients);
@@ -83,7 +89,7 @@ public class RecipeService {
             recipe = fetchRecipeWithRagAndFunctionCallingFor(ingredients);
         }
 
-        if (imageModel.isPresent()) {
+        if (imageModel.isPresent() && mychatmodel.toLowerCase().startsWith("gpt")) {
             var imagePromptTemplate = new PromptTemplate(imageForRecipePromptResource);
             var imagePromptInstructions = imagePromptTemplate.render(Map.of("recipe", recipe.name(), "ingredients", String.join(",", recipe.ingredients())));
             var imageGeneration = imageModel.get().call(new ImagePrompt(imagePromptInstructions)).getResult();
@@ -120,7 +126,7 @@ public class RecipeService {
         var promptTemplate = new PromptTemplate(recipeForIngredientsPromptResource,
                 Map.of("ingredients", String.join(",", ingredients)));
         var advise = new PromptTemplate(preferOwnRecipePromptResource).getTemplate();
-        var advisorSearchRequest = SearchRequest.defaults().withTopK(2).withSimilarityThreshold(0.7);
+        var advisorSearchRequest = SearchRequest.defaults().withTopK(1);
 
         return chatClient.prompt()
                 .user(promptTemplate.render())
@@ -134,7 +140,7 @@ public class RecipeService {
         var promptTemplate = new PromptTemplate(recipeForAvailableIngredientsPromptResource,
                 Map.of("ingredients", String.join(",", ingredients)));
         var advise = new PromptTemplate(preferOwnRecipePromptResource).getTemplate();
-        var advisorSearchRequest = SearchRequest.defaults().withTopK(2).withSimilarityThreshold(0.7);
+        var advisorSearchRequest = SearchRequest.defaults().withTopK(1);
 
         return chatClient.prompt()
                 .user(promptTemplate.render())
@@ -168,7 +174,7 @@ public class RecipeService {
                 .entity(Recipe.class);
     }
 
-    private void setChatClientDefaults() {
+    /*private void setChatClientDefaults() {
         // Workaround: Configurations like function names for Function Calling will be saved between requests. Which means that once Function Calling is used, it is always configured.
         try {
             var defaultClientRequest = (ChatClient.ChatClientRequest) FieldUtils.readField(chatClient, "defaultChatClientRequest", true);
@@ -179,5 +185,5 @@ public class RecipeService {
         } catch (Exception e) {
             log.info("Failed to set defaults for chat client request", e);
         }
-    }
+    }*/
 }

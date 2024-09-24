@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nvidia-version-check
+spec:
+  nodeSelector:
+        "node.kubernetes.io/instance-type": "g4dn.xlarge"
+  restartPolicy: OnFailure
+  containers:
+  - name: nvidia-version-check
+    image: "nvidia/cuda:11.0.3-base-ubuntu20.04"
+    command: ["nvidia-smi"]
+    resources:
+      limits:
+         nvidia.com/gpu: "1"
