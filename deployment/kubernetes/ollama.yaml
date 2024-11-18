@@ -23,7 +23,8 @@ spec:
               value: "*"
             - name: MANAGEMENT_ENDPOINT_ENV_SHOW_VALUES
               value: ALWAYS
-          image: harbor.main.emea.end2end.link/tsalm/recipe-finder
+          image: ghcr.io/timosalm/spring-ai:recipe-finder
+          imagePullPolicy: Always
           name: workload
 ---
 apiVersion: v1
