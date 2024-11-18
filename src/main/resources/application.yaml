@@ -7,7 +7,7 @@ spring:
     ollama:
       chat:
         model: llama3.1
-        options.temperature: 1.0
+        options.temperature: 0.5
       embedding.model: llama3.1
     vectorstore.redis.initialize-schema: true
   servlet.multipart:

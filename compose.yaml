@@ -4,7 +4,7 @@ services:
     ports:
       - 6379
   ollama:
-    image: "ollama/ollama:0.3.6"
+    image: "ollama/ollama:0.4.2"
     container_name: ollama
     profiles:
       - ollama
