@@ -30,6 +30,7 @@ spec:
           - name: SPRING_AI_VECTORSTORE_REDIS_URI
             value: redis://recipe-finder-redis:6379
           image: harbor.main.emea.end2end.link/tsalm/recipe-finder
+          imagePullPolicy: Always
           name: workload
 ---
 apiVersion: v1
