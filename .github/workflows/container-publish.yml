@@ -1,4 +1,4 @@
-name: Publish to GitHub Packages Apache Maven
+name: Publish to GitHub Container Registry
 
 on:
   push:

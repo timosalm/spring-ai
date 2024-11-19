@@ -37,7 +37,7 @@ dependencies {
 	implementation 'org.springframework.ai:spring-ai-pdf-document-reader'
 
 	implementation "org.springframework.ai:spring-ai-spring-boot-docker-compose:${springAiVersion}"
-        implementation 'org.springframework.boot:spring-boot-docker-compose:3.4.0-M2' // Adds support for redis/redis-stack-server container image
+	implementation 'org.springframework.boot:spring-boot-docker-compose:3.4.0-M2' // Adds support for redis/redis-stack-server container image
 
 	implementation 'org.apache.commons:commons-lang3'
 
