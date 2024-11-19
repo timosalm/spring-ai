@@ -1,16 +1,71 @@
+html {
+    font-size: 125%;
+}
+
+body {
+    font-size: 0.7rem;
+    font-family: Metropolis, "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+    color: hsl(198, 0%, 40%);
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: rgb(250, 250, 250);
+}
+
+.content-wrapper {
+    padding: 0.6rem 0.9rem;
+    margin: 2rem 1rem 1rem 1rem;
+    border: 1px solid hsl(198, 0%, 87%);
+    box-shadow: 0 0.15rem 0 0 hsl(198, 0%, 87%);
+    border-radius: 0.15rem;
+    background: white;
+}
+
+header {
+    background-color: #00364d;
+    color: white;
+    padding: 20px;
+    display: inline-flex;
+    align-items: center;
+}
+
+.title {
+    font-size: 0.8rem;
+}
+
 .subtitle {
-    font-size: 80%;
+    font-size: 0.6rem;
     margin-top: 10px;
     margin-left: 5px;
     font-style: italic;
 }
 
-td {
-    vertical-align: top;
+.content {
+    margin-top: 2rem;
+    flex: 1;
+    display: flex;
+    align-items: stretch;
 }
 
-td > :first-child {
-    margin-top: 0;
+.text {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.image {
+    flex: none;
+    max-height: 100vh;
+    height: auto;
+    object-fit: contain;
 }
 
 input, button, select, textarea {
@@ -18,24 +73,37 @@ input, button, select, textarea {
     border-width: 1px;
     border-color: rgb(200, 200, 200);
     border-style: solid;
+    padding: 5px 10px;
+    margin-left: 5px;
+    font-family: Metropolis, "Avenir Next", "Helvetica Neue", Arial, sans-serif;
 }
 
 input[type=text] {
     width: 25em;
 }
 
+h2 {
+    color: black;
+    font-weight: 200;
+    font-size: 1.5rem;
+    margin-top: 0;
+}
+
+h4 {
+    color: black;
+    font-weight: 200;
+    font-size: 1rem;
+}
+
 ul,ol {
     margin-top: 1.2rem;
 }
 
-#recipe-infos-col {
-    padding-right: 5em;
-}
-
-#recipe-img {
-    width: 100%;
+li {
+    line-height: 1.3rem;
 }
 
 #instructions {
     list-style: none;
+    padding-inline-start: 0;
 }
