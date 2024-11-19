@@ -22,8 +22,8 @@ spec:
               secretKeyRef:
                 key: api-key
                 name: recipe-finder-openai
-          - name: SPRING_AI_VECTORSTORE_REDIS_URI
-            value: redis://recipe-finder-redis:6379
+          - name: SPRING_DATA_REDIS_HOST
+            value: recipe-finder-redis
           image: ghcr.io/timosalm/spring-ai:recipe-finder
           imagePullPolicy: Always
           name: workload

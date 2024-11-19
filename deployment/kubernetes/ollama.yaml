@@ -15,8 +15,8 @@ spec:
         - env:
             - name: SPRING_DOCKER_COMPOSE_ENABLED
               value: "false"
-            - name: SPRING_AI_VECTORSTORE_REDIS_URI
-              value: redis://recipe-finder-redis:6379
+            - name: SPRING_DATA_REDIS_HOST
+              value: recipe-finder-redis
             - name: SPRING_AI_OLLAMA_BASE_URL
               value: http://recipe-finder-ollama-llama:11434
             - name: MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE
