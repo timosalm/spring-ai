@@ -32,6 +32,7 @@ public class FetchIngredientsAvailableAtHomeFunction implements Function<FetchIn
         return new Response(availableIngredients);
     }
 
+    // OpenAI doesn't accept function definitions without "properties" parameter.
     public record Request(Object placeholder) {}
 
     public record Response(List<String> ingredientsAvailableAtHome) {}

@@ -59,6 +59,7 @@ header {
 .text {
     flex: 1;
     overflow-y: auto;
+    padding-right: 0.9rem;
 }
 
 .image {
@@ -87,6 +88,7 @@ h2 {
     font-weight: 200;
     font-size: 1.5rem;
     margin-top: 0;
+    text-transform: capitalize;
 }
 
 h4 {
