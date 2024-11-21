@@ -64,6 +64,7 @@ header {
 
 .image {
     flex: none;
+    max-width: 50%;
     max-height: 100vh;
     height: auto;
     object-fit: contain;

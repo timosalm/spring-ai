@@ -7,6 +7,7 @@ import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.image.ImageModel;
 import org.springframework.ai.image.ImagePrompt;
+import org.springframework.ai.model.function.FunctionCallback;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @Service
 public class RecipeService {
@@ -40,6 +42,12 @@ public class RecipeService {
 
     @Value("classpath:/prompts/image-for-recipe")
     private Resource imageForRecipePromptResource;
+
+    @Value("${app.always-available-ingredients}")
+    private List<String> alwaysAvailableIngredients;
+
+    @Value("${app.available-ingredients-in-fridge}")
+    private List<String> availableIngredientsInFridge;
 
     public RecipeService(ChatClient chatClient, Optional<ImageModel> imageModel, VectorStore vectorStore) {
         this.chatClient = chatClient;
@@ -97,9 +105,17 @@ public class RecipeService {
                 .user(us -> us
                         .text(recipeForAvailableIngredientsPromptResource)
                         .param("ingredients", String.join(",", ingredients)))
-                .functions("fetchIngredientsAvailableAtHome")
+                .functions(FunctionCallback.builder()
+                        .description("Fetches ingredients that are available at home")
+                        .function("fetchIngredientsAvailableAtHome", this::fetchIngredientsAvailableAtHome)
+                        .build())
                 .call()
                 .entity(Recipe.class);
+    }
+
+    private List<String> fetchIngredientsAvailableAtHome() {
+        log.info("Fetching ingredients available at home function called by LLM");
+        return Stream.concat(availableIngredientsInFridge.stream(),alwaysAvailableIngredients.stream()).toList();
     }
 
     private Recipe fetchRecipeWithRagFor(List<String> ingredients) {
