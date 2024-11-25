@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.3.5'
+	id 'org.springframework.boot' version '3.4.0'
 	id 'io.spring.dependency-management' version '1.1.6'
 }
 
@@ -37,7 +37,7 @@ dependencies {
 	implementation 'org.springframework.ai:spring-ai-pdf-document-reader'
 
 	implementation "org.springframework.ai:spring-ai-spring-boot-docker-compose:${springAiVersion}"
-	implementation 'org.springframework.boot:spring-boot-docker-compose:3.4.0-M2' // Adds support for redis/redis-stack-server container image
+	implementation 'org.springframework.boot:spring-boot-docker-compose'
 
 	implementation 'org.apache.commons:commons-lang3'
 
