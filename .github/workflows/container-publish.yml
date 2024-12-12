@@ -7,7 +7,9 @@ on:
   pull_request:
     branches:
       - main
-
+permissions:
+  contents: write
+  
 jobs:
   build:
 
@@ -26,7 +28,8 @@ jobs:
         distribution: 'temurin'
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
-
+      with:
+        dependency-graph: generate-and-submit
     - name: Create container image
       run: ./gradlew bootBuildImage --imageName="ghcr.io/${{ github.repository }}:recipe-finder"
 
