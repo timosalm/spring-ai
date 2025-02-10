@@ -6,15 +6,19 @@ spring:
   ai:
     ollama:
       chat:
-        model: llama3.1
+        model: llama3.2
         options.temperature: 0.5
-      embedding.model: llama3.1
+      embedding.model: llama3.2
     vectorstore.redis.initialize-schema: true
   servlet.multipart:
     max-file-size: 100MB
     max-request-size: 100MB
 server.tomcat.max-swallow-size: -1
-
+spring.data.redis:
+  host: localhost
+  port: 232
+  username:
+  password:
 app:
   always-available-ingredients: wine,salt,pepper,olive oil,broth,rice
   available-ingredients-in-fridge: bacon,onions

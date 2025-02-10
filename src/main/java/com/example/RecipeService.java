@@ -106,14 +106,15 @@ public class RecipeService {
                         .text(recipeForAvailableIngredientsPromptResource)
                         .param("ingredients", String.join(",", ingredients)))
                 .functions(FunctionCallback.builder()
-                        .description("Fetches ingredients that are available at home")
                         .function("fetchIngredientsAvailableAtHome", this::fetchIngredientsAvailableAtHome)
+                        .description("Fetches ingredients that are available at home")
+                        .inputType(Void.class)
                         .build())
                 .call()
                 .entity(Recipe.class);
     }
 
-    private List<String> fetchIngredientsAvailableAtHome() {
+    public List<String> fetchIngredientsAvailableAtHome() {
         log.info("Fetching ingredients available at home function called by LLM");
         return Stream.concat(availableIngredientsInFridge.stream(),alwaysAvailableIngredients.stream()).toList();
     }
@@ -123,7 +124,7 @@ public class RecipeService {
         var promptTemplate = new PromptTemplate(recipeForIngredientsPromptResource,
                 Map.of("ingredients", String.join(",", ingredients)));
         var advise = new PromptTemplate(preferOwnRecipePromptResource).getTemplate();
-        var advisorSearchRequest = SearchRequest.defaults().withTopK(2).withSimilarityThreshold(0.7);
+        var advisorSearchRequest = SearchRequest.builder().topK(2).similarityThreshold(0.7).build();
 
         return chatClient.prompt()
                 .user(promptTemplate.render())
@@ -137,7 +138,7 @@ public class RecipeService {
         var promptTemplate = new PromptTemplate(recipeForAvailableIngredientsPromptResource,
                 Map.of("ingredients", String.join(",", ingredients)));
         var advise = new PromptTemplate(preferOwnRecipePromptResource).getTemplate();
-        var advisorSearchRequest = SearchRequest.defaults().withTopK(2).withSimilarityThreshold(0.7);
+        var advisorSearchRequest = SearchRequest.builder().topK(2).similarityThreshold(0.7).build();
 
         return chatClient.prompt()
                 .user(promptTemplate.render())
