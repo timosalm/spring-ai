@@ -10,6 +10,7 @@ import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.model.function.FunctionCallback;
 import org.springframework.ai.reader.pdf.PagePdfDocumentReader;
 import org.springframework.ai.reader.pdf.config.PdfDocumentReaderConfig;
+import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -105,18 +106,15 @@ public class RecipeService {
                 .user(us -> us
                         .text(recipeForAvailableIngredientsPromptResource)
                         .param("ingredients", String.join(",", ingredients)))
-                .functions(FunctionCallback.builder()
-                        .function("fetchIngredientsAvailableAtHome", this::fetchIngredientsAvailableAtHome)
-                        .description("Fetches ingredients that are available at home")
-                        .inputType(Void.class)
-                        .build())
+                .tools(this)
                 .call()
                 .entity(Recipe.class);
     }
 
+    @Tool(description = "Fetches ingredients that are available at home")
     public List<String> fetchIngredientsAvailableAtHome() {
         log.info("Fetching ingredients available at home function called by LLM");
-        return Stream.concat(availableIngredientsInFridge.stream(),alwaysAvailableIngredients.stream()).toList();
+        return Stream.concat(availableIngredientsInFridge.stream(), alwaysAvailableIngredients.stream()).toList();
     }
 
     private Recipe fetchRecipeWithRagFor(List<String> ingredients) {
@@ -142,7 +140,7 @@ public class RecipeService {
 
         return chatClient.prompt()
                 .user(promptTemplate.render())
-                .functions("fetchIngredientsAvailableAtHome")
+                .tools(this)
                 .advisors(new QuestionAnswerAdvisor(vectorStore, advisorSearchRequest, advise))
                 .call()
                 .entity(Recipe.class);
